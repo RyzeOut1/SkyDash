@@ -23,12 +23,3 @@
 - **Cartographie :** [Leaflet.js](https://leafletjs.com/) & OpenStreetMap
 
 ---
-
-## 🚀 Installation & Utilisation
-
-Aucune installation complexe ni serveur requis ! Le projet s'exécute directement dans le navigateur.
-
-1. **Cloner le dépôt :**
-   ```bash
-   git clone [https://github.com/RyzeOut1/skydash.git](https://github.com/RyzeOut1/skydash.git)
-   cd skydash
