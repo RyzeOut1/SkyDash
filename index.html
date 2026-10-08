@@ -1,577 +1,560 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkyDash - Dashboard Météo & Trafic Aérien</title>
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyDash - Dashboard Météo & Trafic Aérien</title>
 
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --accent-cyan: #00f5d4;
-      --accent-blue: #00b4d8;
-      --accent-gold: #ffb703;
-      --text-main: #f8f9fa;
-      --text-muted: #a0aec0;
-      --vfr-color: #2ec4b6;
-      --mvfr-color: #3a86ff;
-      --ifr-color: #e63946;
-      --lifr-color: #d62828;
-    }
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #070a12 100%);
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #00d2ff;
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --vfr-color: #10b981;
+            --mvfr-color: #3b82f6;
+            --ifr-color: #ef4444;
+            --lifr-color: #d946ef;
+        }
 
-    header {
-      background: rgba(11, 19, 43, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--glass-border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-    .logo-container h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.6rem;
-      letter-spacing: 1.5px;
-      background: linear-gradient(90deg, #00f5d4, #00b4d8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        header {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    .badge-live {
-      background: rgba(0, 245, 212, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid var(--accent-cyan);
-      font-size: 0.75rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: 12px;
-      font-family: 'Orbitron', sans-serif;
-      animation: pulse 2s infinite;
-    }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-    }
+        .logo-container h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .location-info {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .badge-live {
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 1.5rem;
-      padding: 1.5rem;
-      flex: 1;
-      max-width: 1800px;
-      margin: 0 auto;
-      width: 100%;
-    }
+        .main-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
 
-    @media (max-width: 1024px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-    .card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 1.25rem;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    }
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
 
-    .card-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.95rem;
-      color: var(--accent-cyan);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--glass-border);
-      padding-bottom: 0.5rem;
-    }
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: 1px;
+        }
 
-    .weather-temp {
-      font-size: 2.8rem;
-      font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
-      margin: 0.5rem 0;
-      color: #fff;
-    }
+        .weather-temp {
+            font-size: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
 
-    .weather-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
+        .weather-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
 
-    .weather-item {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 0.6rem 0.8rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
+        .weather-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    .weather-item .label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: block;
-    }
+        .weather-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
 
-    .weather-item .value {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-top: 0.2rem;
-    }
+        .weather-val {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
 
-    .metar-search {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
 
-    .metar-search input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--glass-border);
-      color: #fff;
-      padding: 0.6rem 0.8rem;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      text-transform: uppercase;
-    }
+        input[type="text"] {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
 
-    .metar-search button {
-      background: var(--accent-blue);
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
 
-    .metar-search button:hover {
-      background: #0096c7;
-    }
+        button {
+            background: var(--accent-cyan);
+            color: #0b0f19;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .flight-rules {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
 
-    .rule-vfr { background: rgba(46, 196, 182, 0.2); color: var(--vfr-color); border: 1px solid var(--vfr-color); }
-    .rule-mvfr { background: rgba(58, 134, 255, 0.2); color: var(--mvfr-color); border: 1px solid var(--mvfr-color); }
-    .rule-ifr { background: rgba(230, 57, 70, 0.2); color: var(--ifr-color); border: 1px solid var(--ifr-color); }
+        .metar-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            line-height: 1.4;
+            min-height: 60px;
+            word-break: break-all;
+        }
 
-    .raw-metar {
-      font-family: monospace;
-      font-size: 0.8rem;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 0.75rem;
-      border-radius: 8px;
-      color: var(--accent-cyan);
-      word-break: break-all;
-      line-height: 1.4;
-    }
+        /* Statut des pistes et mise a jour */
+        .metar-runways-info {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.8rem;
+        }
 
-    .main-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+        .runway-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
 
-    #map {
-      width: 100%;
-      height: 520px;
-      border-radius: 16px;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-      z-index: 1;
-    }
+        .badge-open {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--vfr-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
 
-    .planes-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-    }
+        .badge-closed {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--ifr-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
 
-    .plane-card {
-      background: rgba(11, 19, 43, 0.6);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      transition: transform 0.2s, border-color 0.2s;
-    }
+        .update-time {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-style: italic;
+        }
 
-    .plane-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent-cyan);
-    }
+        .map-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-    .plane-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            z-index: 1;
+        }
 
-    .plane-callsign {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.1rem;
-      color: var(--accent-gold);
-    }
+        .flights-card {
+            flex: 1;
+        }
 
-    .plane-country {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
+        .flights-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
 
-    .plane-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      font-size: 0.85rem;
-    }
-  </style>
+        .flight-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .flight-callsign {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .flight-details {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+
+        /* Footer & Effet lumineux Bleu/Blanc */
+        footer {
+            text-align: center;
+            padding: 25px 10px;
+            margin-top: 30px;
+            background: rgba(11, 15, 25, 0.9);
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .glow-name {
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            text-shadow: 
+                0 0 5px #ffffff,
+                0 0 10px #00d2ff,
+                0 0 20px #00d2ff,
+                0 0 30px #00d2ff;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from {
+                text-shadow: 0 0 5px #ffffff, 0 0 10px #00d2ff, 0 0 15px #00d2ff;
+            }
+            to {
+                text-shadow: 0 0 10px #ffffff, 0 0 20px #00d2ff, 0 0 35px #00d2ff, 0 0 45px #00d2ff;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo-container">
-      <h1>SKY<span style="color:#fff;">DASH</span></h1>
-      <span class="badge-live">LIVE RADAR</span>
+    <header>
+        <div class="logo-container">
+            <h1>SKY DASH</h1>
+            <span class="badge-live">Live Radar</span>
+        </div>
+        <div id="location-name" style="font-size: 0.8rem; color: var(--text-muted);">
+            📍 Position : Région de Montréal (Défaut)
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Barre latérale gauche -->
+        <div class="sidebar">
+            <!-- Météo Locale -->
+            <div class="card">
+                <div class="card-title">
+                    <span>MÉTÉO LOCALE</span>
+                    <span>🌤️</span>
+                </div>
+                <div class="weather-temp" id="temp">--°C</div>
+                <div id="weather-desc" style="color: var(--text-muted); font-size: 0.9rem;">Chargement...</div>
+                
+                <div class="weather-grid">
+                    <div class="weather-item">
+                        <div class="weather-label">Vent</div>
+                        <div class="weather-val" id="wind">-- km/h</div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-label">Pression</div>
+                        <div class="weather-val" id="pressure">-- hPa</div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-label">Humidité</div>
+                        <div class="weather-val" id="humidity">--%</div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-label">Couverture</div>
+                        <div class="weather-val" id="clouds">--%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recherche METAR -->
+            <div class="card">
+                <div class="card-title">
+                    <span>RAPPORT METAR</span>
+                    <span>✈️</span>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="icao-input" placeholder="CYUL" value="CYUL" maxlength="4">
+                    <button onclick="fetchMETAR()">Chercher</button>
+                </div>
+                <div id="flight-category" style="margin-bottom: 0.5rem;"></div>
+                <div class="metar-display" id="metar-text">Entrez un code OACI...</div>
+                
+                <!-- Bloc Statut des Pistes & Horodateur -->
+                <div class="metar-runways-info">
+                    <div class="runway-status">
+                        <span class="badge-open">✈️ Pistes ouvertes : Toutes</span>
+                        <span class="badge-closed" id="runway-closed-badge" style="display:none;">⛔ Pistes fermées : Aucune</span>
+                    </div>
+                    <div class="update-time" id="metar-updated-time">
+                        Dernière actualisation : --:--
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone Carte et Avions -->
+        <div class="map-wrapper">
+            <div id="map"></div>
+
+            <div class="card flights-card">
+                <div class="card-title">
+                    <span>VOLS EN SURVOL (RAYON DE 100 KM)</span>
+                    <span id="flight-count" style="color: var(--accent-gold);">0 Avions</span>
+                </div>
+                <div class="flights-list" id="flights-container">
+                    <div style="color: var(--text-muted);">Recherche des vols à proximité...</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="location-info">
-      <span>📍 Position:</span>
-      <strong id="pos-label">Détection en cours...</strong>
-    </div>
-  </header>
 
-  <div class="dashboard-grid">
-    
-    <!-- Sidebar Left -->
-    <div class="sidebar">
-      
-      <!-- Météo Locale -->
-      <div class="card">
-        <div class="card-title">
-          <span>MÉTÉO LOCALE</span>
-          <span>🌡️</span>
-        </div>
-        <div class="weather-temp" id="weather-temp">--°C</div>
-        <div id="weather-desc" style="color: var(--accent-cyan); font-weight: 500;">Chargement...</div>
-        
-        <div class="weather-grid">
-          <div class="weather-item">
-            <span class="label">Vent</span>
-            <span class="value" id="weather-wind">-- km/h</span>
-          </div>
-          <div class="weather-item">
-            <span class="label">Pression</span>
-            <span class="value" id="weather-press">-- hPa</span>
-          </div>
-          <div class="weather-item">
-            <span class="label">Humidité</span>
-            <span class="value" id="weather-hum">-- %</span>
-          </div>
-          <div class="weather-item">
-            <span class="label">Couverture</span>
-            <span class="value" id="weather-clouds">-- %</span>
-          </div>
-        </div>
-      </div>
+    <!-- Footer -->
+    <footer>
+        <p>Made By <span class="glow-name">RyzeOut</span> — Tout droit réservé © 2026</p>
+    </footer>
 
-      <!-- Météo Aéronautique METAR -->
-      <div class="card">
-        <div class="card-title">
-          <span>RAPPORT METAR</span>
-          <span>🛩️</span>
-        </div>
-        <div class="metar-search">
-          <input type="text" id="icao-input" value="CYHU" placeholder="Code OACI (ex: CYHU)" maxlength="4">
-          <button id="search-metar-btn">Chercher</button>
-        </div>
-        <div>
-          <span id="flight-rule-badge" class="flight-rules rule-vfr">VFR</span>
-          <span id="station-name" style="font-size: 0.85rem; color: var(--text-muted);">Aéroport Saint-Hubert</span>
-        </div>
-        <div class="raw-metar" id="raw-metar-text">
-          CYHU 072300Z 24008KT 15SM FEW240 18/08 A2992 RMK SLP132
-        </div>
-      </div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte (Montréal par défaut)
+        const map = L.map('map').setView([45.5017, -73.5673], 9);
 
-    </div>
+        // Carte sombre ArcGIS sans clé API
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+            maxZoom: 16
+        }).addTo(map);
 
-    <!-- Content Right -->
-    <div class="main-content">
-      
-      <!-- Carte Radar -->
-      <div id="map"></div>
+        let flightMarkers = {};
 
-      <!-- Liste des vols à proximité -->
-      <div class="card">
-        <div class="card-title">
-          <span>VOLS EN SURVOL (RAYON DE 100 KM)</span>
-          <span id="plane-count-badge" style="color: var(--accent-gold);">0 Avion(s)</span>
-        </div>
-        <div class="planes-list" id="planes-container">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Recherche des appareils au-dessus de votre position...</div>
-        </div>
-      </div>
+        // Icône personnalisée d'avion
+        const planeIcon = L.divIcon({
+            html: `<div style="font-size: 18px; filter: drop-shadow(0 0 4px #00d2ff);">✈️</div>`,
+            className: 'plane-marker',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
 
-    </div>
+        // 1. Obtenir Météo via Open-Meteo
+        async function fetchWeather(lat = 45.5017, lon = -73.5673) {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,cloud_cover,weather_code`);
+                const data = await res.json();
+                const current = data.current;
 
-  </div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script>
-    let map, userMarker;
-    let planeMarkers = {};
-    let userLat = 45.5017;
-    let userLng = -73.5673;
-
-    function initMap() {
-      map = L.map('map').setView([userLat, userLng], 9);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        maxZoom: 18
-      }).addTo(map);
-
-      const userIcon = L.divIcon({
-        html: '<div style="background:#00f5d4; width:14px; height:14px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 10px #00f5d4;"></div>',
-        className: 'user-icon',
-        iconSize: [14, 14]
-      });
-
-      userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map)
-        .bindPopup("<b>Votre position actuelle</b>");
-    }
-
-    function getUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            userLat = position.coords.latitude;
-            userLng = position.coords.longitude;
-            
-            document.getElementById('pos-label').innerText = `${userLat.toFixed(2)}°, ${userLng.toFixed(2)}°`;
-            map.setView([userLat, userLng], 9);
-            userMarker.setLatLng([userLat, userLng]);
-
-            fetchLocalWeather(userLat, userLng);
-            fetchPlanesOverhead(userLat, userLng);
-          },
-          () => {
-            document.getElementById('pos-label').innerText = "Région de Montréal (Défaut)";
-            fetchLocalWeather(userLat, userLng);
-            fetchPlanesOverhead(userLat, userLng);
-          }
-        );
-      }
-    }
-
-    async function fetchLocalWeather(lat, lng) {
-      try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,cloud_cover,weather_code`);
-        const data = await res.json();
-        
-        const current = data.current;
-        document.getElementById('weather-temp').innerText = `${Math.round(current.temperature_2m)}°C`;
-        document.getElementById('weather-wind').innerText = `${Math.round(current.wind_speed_10m)} km/h`;
-        document.getElementById('weather-press').innerText = `${Math.round(current.surface_pressure)} hPa`;
-        document.getElementById('weather-hum').innerText = `${current.relative_humidity_2m}%`;
-        document.getElementById('weather-clouds').innerText = `${current.cloud_cover}%`;
-        document.getElementById('weather-desc').innerText = getWeatherDescription(current.weather_code);
-      } catch (err) {
-        console.error("Erreur météo locale:", err);
-      }
-    }
-
-    function getWeatherDescription(code) {
-      const codes = {
-        0: "Ciel dégagé ☀️",
-        1: "Principalement dégagé 🌤️",
-        2: "Partiellement nuageux ⛅",
-        3: "Couvert ☁️",
-        45: "Brouillard 🌫️",
-        61: "Pluie légère 🌧️",
-        63: "Pluie modérée 🌧️",
-        71: "Neige légère ❄️",
-        95: "Orage 🌩️"
-      };
-      return codes[code] || "Conditions variables 🌤️";
-    }
-
-    async function fetchMetar(icao = 'CYHU') {
-      try {
-        const res = await fetch(`https://avwx.rest/api/metar/${icao.toUpperCase()}?token=DEMO_TOKEN`);
-        if(!res.ok) throw new Error();
-        const data = await res.json();
-        document.getElementById('raw-metar-text').innerText = data.raw || "METAR indisponible";
-        document.getElementById('station-name').innerText = data.station || icao.toUpperCase();
-        
-        const badge = document.getElementById('flight-rule-badge');
-        badge.innerText = data.flight_rules || 'VFR';
-        badge.className = `flight-rules rule-${(data.flight_rules || 'VFR').toLowerCase()}`;
-      } catch (err) {
-        document.getElementById('raw-metar-text').innerText = `${icao.toUpperCase()} 072300Z 24008KT 15SM FEW240 18/08 A2992 RMK SLP132`;
-        document.getElementById('station-name').innerText = `Aéroport ${icao.toUpperCase()}`;
-      }
-    }
-
-    async function fetchPlanesOverhead(lat, lng) {
-      const delta = 1.0; 
-      const lamin = lat - delta, lamax = lat + delta;
-      const lomin = lng - delta, lomax = lng + delta;
-
-      try {
-        const res = await fetch(`https://opensky-network.org/api/states/all?lamin=${lamin}&lamin=${lamin}&lamax=${lamax}&lomin=${lomin}&lomax=${lomax}`);
-        const data = await res.json();
-        
-        let planes = data.states || [];
-        renderPlanes(planes);
-      } catch (err) {
-        renderSimulatedPlanes(lat, lng);
-      }
-    }
-
-    function renderSimulatedPlanes(lat, lng) {
-      const mockPlanes = [
-        ["aca412", "ACA412 ", "Canada", 1728333, 1728333, lng + 0.15, lat + 0.1, 10668, false, 230, 85, 0, null, 10500, "7012", false, 0],
-        ["tsc204", "TSC204 ", "Canada", 1728333, 1728333, lng - 0.2, lat - 0.15, 8400, false, 195, 210, -3.2, null, 8300, "4211", false, 0],
-        ["c-fgbc", "CFGBC  ", "Canada", 1728333, 1728333, lng + 0.05, lat - 0.08, 1200, false, 55, 340, 0, null, 1200, "1200", false, 0]
-      ];
-      renderPlanes(mockPlanes);
-    }
-
-    function renderPlanes(states) {
-      const container = document.getElementById('planes-container');
-      document.getElementById('plane-count-badge').innerText = `${states.length} Avion(s)`;
-      container.innerHTML = '';
-
-      if (states.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted);">Aucun avion détecté pour le moment.</div>';
-        return;
-      }
-
-      states.slice(0, 6).forEach(plane => {
-        const callsign = (plane[1] || 'INCONNU').trim();
-        const country = plane[2] || 'Inconnu';
-        const altMeters = plane[7] || 0;
-        const altFeet = Math.round(altMeters * 3.28084);
-        const speedKts = Math.round((plane[9] || 0) * 1.94384);
-        const heading = Math.round(plane[10] || 0);
-        const pLat = plane[6];
-        const pLng = plane[5];
-
-        const card = document.createElement('div');
-        card.className = 'plane-card';
-        card.innerHTML = `
-          <div class="plane-header">
-            <span class="plane-callsign">✈️ ${callsign}</span>
-            <span class="plane-country">${country}</span>
-          </div>
-          <div class="plane-stats">
-            <div><span style="color:var(--text-muted)">Alt:</span> ${altFeet} ft</div>
-            <div><span style="color:var(--text-muted)">Vit:</span> ${speedKts} kts</div>
-            <div><span style="color:var(--text-muted)">Cap:</span> ${heading}°</div>
-            <div><span style="color:var(--text-muted)">Squawk:</span> ${plane[14] || 'N/A'}</div>
-          </div>
-        `;
-        container.appendChild(card);
-
-        if (pLat && pLng) {
-          const planeIcon = L.divIcon({
-            html: `<div style="transform: rotate(${heading}deg); font-size: 20px;">✈️</div>`,
-            className: 'plane-icon',
-            iconSize: [24, 24]
-          });
-
-          if (planeMarkers[callsign]) {
-            planeMarkers[callsign].setLatLng([pLat, pLng]);
-          } else {
-            planeMarkers[callsign] = L.marker([pLat, pLng], { icon: planeIcon })
-              .addTo(map)
-              .bindPopup(`<b>Vol ${callsign}</b><br>Altitude: ${altFeet} ft<br>Vitesse: ${speedKts} kts`);
-          }
+                document.getElementById('temp').innerText = `${Math.round(current.temperature_2m)}°C`;
+                document.getElementById('wind').innerText = `${Math.round(current.wind_speed_10m)} km/h`;
+                document.getElementById('pressure').innerText = `${Math.round(current.surface_pressure)} hPa`;
+                document.getElementById('humidity').innerText = `${current.relative_humidity_2m}%`;
+                document.getElementById('clouds').innerText = `${current.cloud_cover}%`;
+                document.getElementById('weather-desc').innerText = getWeatherDescription(current.weather_code);
+            } catch (err) {
+                console.error("Erreur météo:", err);
+            }
         }
-      });
-    }
 
-    document.getElementById('search-metar-btn').addEventListener('click', () => {
-      const code = document.getElementById('icao-input').value;
-      if (code) fetchMetar(code);
-    });
+        function getWeatherDescription(code) {
+            if (code === 0) return 'Dégagé ☀️';
+            if (code <= 3) return 'Nuageux ☁️';
+            if (code <= 67) return 'Pluie 🌧️';
+            if (code <= 77) return 'Neige ❄️';
+            return 'Orageux 🌩️';
+        }
 
-    window.onload = () => {
-      initMap();
-      getUserLocation();
-      fetchMetar('CYHU');
-    };
-  </script>
+        // 2. Obtenir METAR via AVWX
+        async function fetchMETAR() {
+            const icao = document.getElementById('icao-input').value.toUpperCase().trim();
+            if (!icao) return;
+
+            document.getElementById('metar-text').innerText = "Chargement...";
+            
+            try {
+                const res = await fetch(`https://avwx.rest/api/metar/${icao}?token=DEMO_TOKEN`);
+                if (!res.ok) throw new Error("Aérodrome introuvable");
+                const data = await res.json();
+
+                document.getElementById('metar-text').innerText = data.raw;
+                
+                // Mettre à jour la catégorie de vol
+                const cat = data.flight_rules || 'VFR';
+                document.getElementById('flight-category').innerHTML = `<span class="badge-open" style="background: var(--${cat.toLowerCase()}-color, #10b981); color:#fff;">${cat}</span> Aéroport ${icao}`;
+                
+                // Mettre à jour l'heure de dernière actualisation
+                const now = new Date();
+                document.getElementById('metar-updated-time').innerText = `Dernière actualisation : ${now.toLocaleTimeString()}`;
+
+            } catch (err) {
+                document.getElementById('metar-text').innerText = `METAR non disponible pour ${icao}.`;
+                document.getElementById('flight-category').innerHTML = '';
+            }
+        }
+
+        // 3. Obtenir Trafic Aérien via OpenSky Network
+        async function fetchFlights() {
+            try {
+                // Zone de ~100km autour de Montréal
+                const res = await fetch('https://opensky-network.org/api/states/all?lamin=44.5&lomin=-74.5&lamax=46.5&lomax=-72.5');
+                const data = await res.json();
+                
+                const flightsContainer = document.getElementById('flights-container');
+                flightsContainer.innerHTML = '';
+
+                if (!data.states || data.states.length === 0) {
+                    flightsContainer.innerHTML = '<div style="color: var(--text-muted);">Aucun appareil détecté dans la zone.</div>';
+                    document.getElementById('flight-count').innerText = "0 Avions";
+                    return;
+                }
+
+                document.getElementById('flight-count').innerText = `${data.states.length} Avions`;
+
+                data.states.slice(0, 8).forEach(flight => {
+                    const callsign = flight[1] ? flight[1].trim() : 'N/A';
+                    const country = flight[2];
+                    const altitude = flight[7] ? `${Math.round(flight[7] * 3.28084)} ft` : 'N/A';
+                    const velocity = flight[5] ? `${Math.round(flight[5] * 1.94384)} kts` : 'N/A';
+                    const lat = flight[6];
+                    const lon = flight[5];
+
+                    // Affichage dans la liste
+                    const item = document.createElement('div');
+                    item.className = 'flight-item';
+                    item.innerHTML = `
+                        <div class="flight-callsign">✈️ ${callsign}</div>
+                        <div class="flight-details">
+                            <div>Pays : ${country}</div>
+                            <div>Alt : ${altitude} | Vit : ${velocity}</div>
+                        </div>
+                    `;
+                    flightsContainer.appendChild(item);
+
+                    // Ajout du marqueur sur la carte
+                    if (lat && lon) {
+                        if (!flightMarkers[callsign]) {
+                            flightMarkers[callsign] = L.marker([lat, lon], { icon: planeIcon }).addTo(map);
+                        } else {
+                            flightMarkers[callsign].setLatLng([lat, lon]);
+                        }
+                        flightMarkers[callsign].bindPopup(`<b>${callsign}</b><br>Alt: ${altitude}<br>Vit: ${velocity}`);
+                    }
+                });
+
+            } catch (err) {
+                console.error("Erreur OpenSky:", err);
+            }
+        }
+
+        // Lancement initial
+        fetchWeather();
+        fetchMETAR();
+        fetchFlights();
+
+        // Rafraîchissement automatique des vols (toutes les 15 secondes)
+        setInterval(fetchFlights, 15000);
+    </script>
 </body>
 </html>
